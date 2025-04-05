@@ -20,12 +20,12 @@ import java.util.Scanner;
 
                 System.out.print(calc1.getName() + "-twoje BMI: ");
                 System.out.format("%.2f\n", calc1.getBMI());
-                System.out.println("Nadweaga: " + calc1.getBMI());
+                System.out.println("Nadwaga: " + calc1.isOverweight());
 
                 System.out.print("\nPodaj imię: ");
                 name = sc.nextLine();
                 System.out.print("Podaj wzrost(m): ");
-                height.Float.parseFlopat(sc.nextLine());
+                height = Float.parseFloat(sc.nextLine());
                 System.out.print("Podaj masę(kg): ");
                 weight = Integer.parseInt(sc.nextLine());
 

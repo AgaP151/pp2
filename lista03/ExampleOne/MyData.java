@@ -1,14 +1,14 @@
-import java.time.LocaleDateTime;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.net.InetAdrress;
+import java.net.InetAddress;
 
 public class MyData {
 public static void info(){
     var bioData = "Jan Maria Janowski, 12345";
     System.out.println(bioData);
 
-    LocaleDateTime Idt = LocaleDateTime.now();
-    DateTimeFormatter dtf = dateTimeFormatter.ofPattern("dd-MMMM-yyyy HH:mm:ss");
+    LocalDateTime Idt = LocalDateTime.now();
+    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MMMM-yyyy HH:mm:ss");
     String formatDateTime = Idt.format(dtf);
     System.out.println(formatDateTime);
 
@@ -18,7 +18,7 @@ public static void info(){
     String osname = System.getProperty("os.name");
     System.out.println("osname");;
     try{
-        string ipAddress = InetAddress.getLocaleHost().getHostAddress();
+        String ipAddress = InetAddress.getLocalHost().getHostAddress();
         System.out.println(ipAddress);
 }
     catch (Exception e) {
