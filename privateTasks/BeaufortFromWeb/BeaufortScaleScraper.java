@@ -1,11 +1,9 @@
-package BeaufortFromWeb;
-
+import java.util.Scanner;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.util.Scanner;
 
 public class BeaufortScaleScraper {
     public static void main(String[] args) {
@@ -34,7 +32,6 @@ public class BeaufortScaleScraper {
                     .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36")
                     .get();
 
-            System.out.println("\nPołączono ze stroną");
 
             // Pobranie pierwszej tabeli z klasą "wikitable"
             Element tabela = doc.select("table.wikitable").first();
@@ -43,26 +40,38 @@ public class BeaufortScaleScraper {
                 Elements wiersze = tabela.select("tr");
                 boolean znaleziono = false;
 
-                String stopien = "";
-                String zakresPredkosciKMH = "";
-                String opis= "";
-                String stanMorza= "";
-                for (Element wiersz : wiersze) {
-                    Elements naglowki = wiersz.select("th");
+                for (int i = 1; i < wiersze.size(); i++) {
+                    Element wiersz = wiersze.get(i);
+
+
+
+                    Element thElement = wiersz.select("th").first();
+                    String stopien = (thElement != null) ? thElement.text().trim(): "Brak danych";
+
                     Elements komorki = wiersz.select("td");
-                    if (naglowki.size() > 4 ){
-                         stopien = naglowki.get(0).text().trim();
-                         zakresPredkosciKMH = naglowki.get(4).text().trim();
-                    }
 
-                    if (komorki.size() > 4) {  // Sprawdzamy, czy wiersz ma wystarczającą liczbę komórek
-                         opis = komorki.get(1).text().trim();
-                         stanMorza = komorki.get(2).text().trim();
-                    }
+                    if (komorki.size() >= 5) {
+                       // String stopien = komorki.get(0).text().trim();
+                        String zakresPredkosciKMH = komorki.get(1).text().trim();
+                        String opis = komorki.get(5).text().trim();
+                        String stanMorza = komorki.get(8).text().trim();
 
-                    if (komorki.size() > 4 && naglowki.size() >4 )
-                    {
-                         // Pobieramy zakres z kolumny km/h
+//                for (Element wiersz : wiersze) {
+//                    Elements naglowki = wiersz.select("th");
+//                    Elements komorki = wiersz.select("td");
+//                    if (naglowki.size() > 4 ){
+//                         stopien = naglowki.get(0).text().trim();
+//                         zakresPredkosciKMH = naglowki.get(4).text().trim();
+//                    }
+//
+//                    if (komorki.size() > 4) {  // Sprawdzamy, czy wiersz ma wystarczającą liczbę komórek
+//                         opis = komorki.get(1).text().trim();
+//                         stanMorza = komorki.get(2).text().trim();
+//                    }
+//
+//                    if (komorki.size() > 4 && naglowki.size() >4 )
+//                    {
+                        // Pobieramy zakres z kolumny km/h
 
 
                         // Sprawdzenie, czy podana prędkość mieści się w zakresie
@@ -92,13 +101,9 @@ public class BeaufortScaleScraper {
     // Metoda do sprawdzania, czy prędkość pasuje do zakresu podanego w tabeli
     private static boolean czyPredkoscPasuje(int predkosc, String zakres) {
 //        // Zamiana myślnika „–” (en-dash) na klasyczny "-"
-//        zakres = zakres.replace("–", "-");
-//
-//        // Zamiana przecinków na kropki (dla liczb typu 0,2 zamiast 0.2)
-//        zakres = zakres.replace(",", ".");
-//
+        zakres = zakres.replace("–", "-").replace(",", ".").trim();
 //        // Usuwamy wszelkie zbędne znaki (np. ≥)
-//        zakres = zakres.replaceAll("[^0-9.-]", "").trim();
+       // zakres = zakres.replaceAll("[^0-9.-]", "");
 
         if (zakres.contains("-")) { // Jeśli zakres jest w formie np. "50-61"
             String[] granice = zakres.split("-");
@@ -107,16 +112,19 @@ public class BeaufortScaleScraper {
                 int max = Integer.parseInt(granice[1].trim());
                 return predkosc >= min && predkosc <= max;
             } catch (NumberFormatException e) {
-                System.out.println("⚠ Błąd parsowania zakresu: " + zakres);
+                // System.out.println("⚠ Błąd parsowania zakresu: " + zakres);
                 return false;
             }
-        } else { // Jeśli jest pojedyncza wartość np. "117+"
+        } else if (zakres.endsWith("+")) {// Jeśli jest pojedyncza wartość np. "117+"
             try {
-                return predkosc >= Integer.parseInt(zakres.replace("+", "").trim());
+                int min = Integer.parseInt(zakres.replace("+", "").trim());
+                return predkosc >= min;
             } catch (NumberFormatException e) {
-                System.out.println("⚠ Błąd parsowania wartości: " + zakres);
+                // System.out.println("⚠ Błąd parsowania wartości: " + zakres);
                 return false;
             }
         }
+        return false;
     }
 }
+
